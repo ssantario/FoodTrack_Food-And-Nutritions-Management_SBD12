@@ -1,0 +1,209 @@
+{
+    "info": {
+        "name": "FoodTrack API (Full)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        { "key": "base_url", "value": "http://localhost:5000/api" },
+        { "key": "token", "value": "" }
+    ],
+    "item": [
+        {
+        "name": "Auth",
+        "item": [
+            {
+            "name": "Register",
+            "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"dummy\",\n  \"email\": \"dummy@example.com\",\n  \"password\": \"dummy123\"\n}"
+                },
+                "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+            }
+            },
+            {
+            "name": "Login",
+            "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"dummy@example.com\",\n  \"password\": \"dummy123\"\n}"
+                },
+                "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+            }
+            }
+        ]
+        },
+        {
+        "name": "User",
+        "item": [
+            {
+            "name": "Get Profile",
+            "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/users/profile", "host": ["{{base_url}}"], "path": ["users", "profile"] }
+            }
+            },
+            {
+            "name": "Update Profile",
+            "request": {
+                "method": "PUT",
+                "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"New Name\",\n  \"email\": \"new@email.com\"\n}"
+                },
+                "url": { "raw": "{{base_url}}/users/profile", "host": ["{{base_url}}"], "path": ["users", "profile"] }
+            }
+            },
+            {
+            "name": "Update Password",
+            "request": {
+                "method": "PUT",
+                "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                "mode": "raw",
+                "raw": "{\n  \"currentPassword\": \"oldpassword\",\n  \"newPassword\": \"newpassword\"\n}"
+                },
+                "url": { "raw": "{{base_url}}/users/password", "host": ["{{base_url}}"], "path": ["users", "password"] }
+            }
+            },
+            {
+            "name": "Update Meal Schedule",
+            "request": {
+                "method": "PUT",
+                "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                "mode": "raw",
+                "raw": "{\n  \"meal_schedule\": { \"breakfast\": \"08:00\", \"lunch\": \"12:00\", \"dinner\": \"19:00\" }\n}"
+                },
+                "url": { "raw": "{{base_url}}/users/meal-schedule", "host": ["{{base_url}}"], "path": ["users", "meal-schedule"] }
+            }
+            },
+            {
+            "name": "Update Nutrition Goals",
+            "request": {
+                "method": "PUT",
+                "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                "mode": "raw",
+                "raw": "{\n  \"daily_nutrition_goals\": { \"calories\": 2000, \"protein\": 50, \"carbs\": 250, \"fat\": 70 }\n}"
+                },
+                "url": { "raw": "{{base_url}}/users/nutrition-goals", "host": ["{{base_url}}"], "path": ["users", "nutrition-goals"] }
+            }
+            }
+        ]
+        },
+        {
+        "name": "Foods",
+        "item": [
+            {
+            "name": "Get All Foods",
+            "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/foods", "host": ["{{base_url}}"], "path": ["foods"] }
+            }
+            },
+            {
+            "name": "Get Food by ID",
+            "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/foods/1", "host": ["{{base_url}}"], "path": ["foods", "1"] }
+            }
+            },
+            {
+            "name": "Create Food",
+            "request": {
+                "method": "POST",
+                "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Banana\"\n}"
+                },
+                "url": { "raw": "{{base_url}}/foods", "host": ["{{base_url}}"], "path": ["foods"] }
+            }
+            },
+            {
+            "name": "Update Food",
+            "request": {
+                "method": "PUT",
+                "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Updated Banana\",\n  \"calories\": 120\n}"
+                },
+                "url": { "raw": "{{base_url}}/foods/1", "host": ["{{base_url}}"], "path": ["foods", "1"] }
+            }
+            },
+            {
+            "name": "Delete Food",
+            "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/foods/1", "host": ["{{base_url}}"], "path": ["foods", "1"] }
+            }
+            }
+        ]
+        },
+        {
+        "name": "Meals",
+        "item": [
+            {
+            "name": "Get Meals",
+            "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/meals", "host": ["{{base_url}}"], "path": ["meals"] }
+            }
+            },
+            {
+            "name": "Create Meal",
+            "request": {
+                "method": "POST",
+                "header": [
+                { "key": "Authorization", "value": "Bearer {{token}}" },
+                { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                "mode": "raw",
+                "raw": "{\n  \"meal_type\": \"breakfast\",\n  \"meal_time\": \"2024-06-01T08:00:00Z\",\n  \"food_items\": [\n    { \"food_id\": 1, \"quantity\": 2 }\n  ]\n}"
+                },
+                "url": { "raw": "{{base_url}}/meals", "host": ["{{base_url}}"], "path": ["meals"] }
+            }
+            },
+            {
+            "name": "Delete Meal",
+            "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/meals/1", "host": ["{{base_url}}"], "path": ["meals", "1"] }
+            }
+            }
+        ]
+        }
+    ]
+}
