@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const authRoutes = require('./routes/authRoutes');
-const foodRoutes = require('./routes/foodRoutes');
-const mealRoutes = require('./routes/mealRoutes');
-const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./src/routes/authRoutes');
+const foodRoutes = require('./src/routes/foodRoutes');
+const mealRoutes = require('./src/routes/mealRoutes');
+const userRoutes = require('./src/routes/userRoutes');
+const notificationRoutes = require('./src/routes/notificationRoutes');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/foods', foodRoutes);
 app.use('/api/meals', mealRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {

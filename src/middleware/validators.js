@@ -29,11 +29,22 @@ function isValidMealSchedule(schedule) {
         /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(time)
     );
 }
+function validateRegisterInput(req, res, next) {
+    const { name, email } = req.body;
+    if (!isValidName(name)) {
+        return res.status(400).json({ error: 'Invalid name' });
+    }
+    if (!isValidEmail(email)) {
+        return res.status(400).json({ error: 'Invalid email' });
+    }
+    next();
+}
 
 module.exports = {
     isValidEmail,
     isValidPassword,
     isValidName,
     isValidNutritionGoals,
-    isValidMealSchedule
+    isValidMealSchedule,
+    validateRegisterInput // <-- add this line
 };

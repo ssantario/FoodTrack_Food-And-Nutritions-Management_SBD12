@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 // Create a new meal with associated foods
 async function createMeal(req, res) {
-    const client = await db.getClient();
+    const client = await db.connect();
     
     try {
         await client.query('BEGIN');
@@ -152,7 +152,7 @@ async function getMeals(req, res) {
 
 // Delete a meal
 async function deleteMeal(req, res) {
-    const client = await db.getClient();
+    const client = await db.connect();
     try {
         await client.query('BEGIN');
         const { id } = req.params;
