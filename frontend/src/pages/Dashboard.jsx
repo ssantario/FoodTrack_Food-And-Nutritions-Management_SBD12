@@ -1,4 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import foodLogo from "../assets/apple-svgrepo-com.svg";
+import foodLogoWhite from "../assets/appleWhite.svg"
 
 // Ikon SVG tetap sama, bisa disesuaikan jika perlu
 const IconFire = () => <svg className="w-8 h-8 text-[#2f7d6f]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A7.987 7.987 0 0117.657 18.657zM9 17a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>;
@@ -15,9 +18,9 @@ const AppNavbar = () => {
   const navItems = [
     { path: "/", label: "Home", icon: <IconHome /> },
     { path: "/dashboard", label: "Dashboard", icon: <IconChartBar className="w-5 h-5 mr-2" /> },
-    { path: "/meal-register", label: "Catat Makan", icon: <IconPlusCircle className="w-5 h-5 mr-2" /> },
+    { path: "/food-list", label: "Daftar Makanan", icon: <img src={foodLogoWhite} alt="Daftar Makanan" className="w-5 h-5 mr-2" /> },
     { path: "/history", label: "Riwayat", icon: <IconClipboardList className="w-5 h-5 mr-2" /> },
-    { path: "/profile", label: "Profil", icon: <IconUserCircle /> }, // Contoh link profil
+    { path: "/profile", label: "Profil", icon: <IconUserCircle /> },
   ];
 
   return (
@@ -71,29 +74,52 @@ export default function Dashboard() {
 
   const mealLog = { eaten: 3, total: 4 };
 
+
+  const nutritionTips = [
+    "Pastikan untuk minum setidaknya 8 gelas air hari ini untuk menjaga hidrasi optimal.",
+    "Variasikan sumber protein Anda, coba tambahkan ikan atau kacang-kacangan dalam menu!",
+    "Konsumsi sayuran berwarna-warni setiap hari untuk asupan vitamin dan mineral yang beragam.",
+    "Batasi konsumsi gula tambahan dan pilih camilan sehat seperti buah segar.",
+    "Jangan lewatkan sarapan untuk menjaga energi sepanjang hari.",
+    "Pilih karbohidrat kompleks seperti nasi merah atau roti gandum untuk rasa kenyang lebih lama.",
+    "Perhatikan porsi makan, gunakan piring yang lebih kecil untuk membantu mengontrol asupan.",
+    "Konsumsi lemak sehat dari alpukat, kacang, dan minyak zaitun.",
+    "Hindari minuman bersoda dan pilih air putih atau infused water.",
+    "Cobalah makan secara perlahan dan nikmati setiap suapan untuk membantu pencernaan.",
+    "Kalo makan disuapin ahmad pasti jadi lebh enak",
+    "Jika Anda ingin besar seperti Azka Nabihan makanlah ayam banyak-banyak dan jangan lupa untuk berolahraga.",
+  ];
+
+  const [randomTip, setRandomTip] = useState("");
+
+  useEffect(() => {
+    const idx = Math.floor(Math.random() * nutritionTips.length);
+    setRandomTip(nutritionTips[idx]);
+  }, []);
+
   return (
     <>
       <AppNavbar />
-      <div className="min-h-screen bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7] p-6 md:p-10">
-        <header className="mt-8 mb-12 text-center md:text-left"> {/* Tambah mt-8 untuk spasi dari navbar */}
-          <h1 className="text-4xl md:text-5xl font-bold text-[#2f7d6f] tracking-tight">Dashboard Nutrisi Anda</h1>
-          <p className="text-slate-600 mt-3 text-lg md:text-xl">
+      <div className="min-h-screen bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7] p-3 md:p-10">
+        <header className="mt-6 md:mt-8 mb-8 md:mb-12 text-center md:text-left">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#2f7d6f] tracking-tight">Dashboard Nutrisi Anda</h1>
+          <p className="text-slate-600 mt-2 md:mt-3 text-base md:text-xl">
             Selamat datang kembali! Pantau progres nutrisi harian Anda dengan mudah.
           </p>
         </header>
 
-        <div className="mb-12 flex justify-center md:justify-start">
+        <div className="mb-8 md:mb-12 flex flex-col md:flex-row justify-center md:justify-start gap-3 md:gap-0">
           <Link to="/meal-register">
             <button
-              className="bg-gradient-to-r from-[#41897c] to-[#5ab8a5] text-white font-semibold px-7 py-3.5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center text-lg focus:outline-none focus:ring-2 focus:ring-[#5ab8a5] focus:ring-opacity-50"
+              className="bg-gradient-to-r from-[#41897c] to-[#5ab8a5] text-white font-semibold px-5 md:px-7 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-[#5ab8a5] focus:ring-opacity-50"
             >
-              <IconPlusCircle />
+              <img src={foodLogoWhite} alt="Catat Makanan" className="w-6 h-6 md:w-7 md:h-7 mr-2.5" />
               Catat Makanan Baru
             </button>
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
           {/* Card Kalori Hari Ini */}
           <div className="bg-white p-7 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/80 transform hover:scale-[1.02]">
             <div className="flex items-center mb-5">
@@ -167,12 +193,11 @@ export default function Dashboard() {
         </div>
 
         {/* Section Tips Nutrisi (tanpa grafik) */}
-        <div className="mt-12 bg-white p-8 rounded-2xl shadow-xl border border-gray-200/80">
-          <h3 className="text-2xl font-semibold text-slate-800 mb-4">💡 Tips Nutrisi Hari Ini</h3>
+        <div className="mt-8 md:mt-12 bg-white p-4 md:p-8 rounded-2xl shadow-xl border border-gray-200/80">
+          <h3 className="text-xl md:text-2xl font-semibold text-slate-800 mb-3 md:mb-4">💡 Tips Nutrisi Hari Ini</h3>
           <div>
-            <p className="text-slate-600 leading-relaxed text-md">
-              Pastikan untuk minum setidaknya 8 gelas air hari ini untuk menjaga hidrasi optimal.
-              Variasikan juga sumber protein Anda, coba tambahkan ikan atau kacang-kacangan dalam menu!
+            <p className="text-slate-600 leading-relaxed text-sm md:text-md">
+              {randomTip}
             </p>
           </div>
         </div>

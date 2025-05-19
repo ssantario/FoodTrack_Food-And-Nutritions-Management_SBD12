@@ -256,352 +256,354 @@ export default function Profile() {
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-altGreen p-6 md:p-10 flex justify-center items-center">
-      <div className="absolute left-6 top-6">
-        <button
-          onClick={() => navigate("/")}
-          className="w-14 h-14 rounded-full bg-main flex items-center justify-center shadow-lg hover:bg-secondary focus:bg-secondary transition-colors duration-200 outline-none focus:ring-4 focus:ring-main/30 group"
-          aria-label="Home"
-        >
-          <svg className="w-7 h-7 text-white group-hover:text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10" />
-          </svg>
-        </button>
-      </div>
-      <div className="max-w-3xl mx-auto flex flex-col gap-8">
-        {/* Card: Informasi Pribadi */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 flex items-start gap-6"> {/* Changed items-center to items-start for better alignment with multiline edit form */}
-          <div className="flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
-              <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+    <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-altGreen p-3 md:p-10 flex justify-center items-center">
+      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl p-3 md:p-8 border border-gray-200/80 flex flex-col gap-4 md:gap-8">
+        <div className="absolute left-4 md:left-6 top-4 md:top-6">
+          <button
+            onClick={() => navigate("/")}
+            className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-main flex items-center justify-center shadow-lg hover:bg-secondary focus:bg-secondary transition-colors duration-200 outline-none focus:ring-4 focus:ring-main/30 group"
+            aria-label="Home"
+          >
+            <svg className="w-6 h-6 md:w-7 md:h-7 text-white group-hover:text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex flex-col gap-4 md:gap-8">
+          {/* Card: Informasi Pribadi */}
+          <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row items-start gap-4 md:gap-6">
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
+                <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              </div>
             </div>
-          </div>
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-main">Informasi Pribadi</h2>
-              {!isEditingProfile ? (
-                <button
-                  onClick={handleEditProfileToggle}
-                  className="bg-main text-white px-3 py-1 rounded-md hover:bg-secondary text-sm shadow transition-colors ease-in-out duration-200"
-                  disabled={loading}
-                >
-                  Edit
-                </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSaveProfile}
-                    className="bg-altGreen text-black px-3 py-1 rounded-md hover:bg-altGreen/50 text-sm shadow transition-colors ease-in-out duration-200"
-                    disabled={loading}
-                  >
-                    {loading ? "Menyimpan..." : "Simpan"}
-                  </button>
+            <div className="flex-1 w-full">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-main">Informasi Pribadi</h2>
+                {!isEditingProfile ? (
                   <button
                     onClick={handleEditProfileToggle}
-                    className="bg-gray-300 text-black px-3 py-1 rounded-md hover:bg-gray-400 text-sm shadow transition-colors ease-in-out duration-200"
+                    className="bg-main text-white px-3 py-1 rounded-md hover:bg-secondary text-sm shadow transition-colors ease-in-out duration-200"
                     disabled={loading}
                   >
-                    Batal
+                    Edit
                   </button>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveProfile}
+                      className="bg-altGreen text-black px-3 py-1 rounded-md hover:bg-altGreen/50 text-sm shadow transition-colors ease-in-out duration-200"
+                      disabled={loading}
+                    >
+                      {loading ? "Menyimpan..." : "Simpan"}
+                    </button>
+                    <button
+                      onClick={handleEditProfileToggle}
+                      className="bg-gray-300 text-black px-3 py-1 rounded-md hover:bg-gray-400 text-sm shadow transition-colors ease-in-out duration-200"
+                      disabled={loading}
+                    >
+                      Batal
+                    </button>
+                  </div>
+                )}
+              </div>
+              {profileUpdateStatus.message && (
+                <div className={`mb-2 text-sm font-medium ${profileUpdateStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                  {profileUpdateStatus.message}
                 </div>
               )}
-            </div>
-            {profileUpdateStatus.message && (
-              <div className={`mb-2 text-sm font-medium ${profileUpdateStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                {profileUpdateStatus.message}
-              </div>
-            )}
-            {isEditingProfile ? (
-              <div className="mt-2 space-y-4">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-semibold text-main mb-1">Nama:</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={editableProfile.name}
-                    onChange={handleProfileInputChange}
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main text-sm"
-                    disabled={loading}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-main mb-1">Email:</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={editableProfile.email}
-                    onChange={handleProfileInputChange}
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main text-sm"
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="mt-2 text-sm">
-                <div className="flex items-center mb-2">
-                  <span className="font-semibold text-main w-20 mr-2">Nama:</span>
-                  <span className="text-gray-700">{profile.name || <span className="italic text-gray-400">- Tidak ada data -</span>}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="font-semibold text-main w-20 mr-2">Email:</span>
-                  <span className="text-gray-700">{profile.email || <span className="italic text-gray-400">- Tidak ada data -</span>}</span>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Card: Jadwal Makan */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 flex items-center gap-6">
-          <div className="flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
-              <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-            </div>
-          </div>
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-1">
-              <h2 className="text-xl font-bold text-main">Jadwal Makan</h2>
-              {!isEditingSchedule ? (
-                <button
-                  onClick={handleEditScheduleToggle}
-                  className="bg-main text-white px-3 py-1 rounded-md hover:bg-secondary text-sm shadow transition-colors duration-200"
-                  disabled={loading}
-                >
-                  Edit
-                </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSaveSchedule}
-                    className="bg-altGreen text-black px-3 py-1 rounded-md hover:bg-altGreen/50 text-sm shadow transition-colors duration-200"
-                    disabled={loading}
-                  >
-                    {loading ? "Menyimpan..." : "Simpan"}
-                  </button>
-                  <button
-                    onClick={handleEditScheduleToggle}
-                    className="bg-gray-300 text-black px-3 py-1 rounded-md hover:bg-gray-400 text-sm shadow transition-colors duration-200"
-                    disabled={loading}
-                  >
-                    Batal
-                  </button>
-                </div>
-              )}
-            </div>
-            {scheduleUpdateStatus.message && (
-              <div className={`mb-2 text-sm font-medium ${scheduleUpdateStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                {scheduleUpdateStatus.message}
-              </div>
-            )}
-            <div className="flex items-center mb-2">
-              <label className="mr-2 font-medium text-main">Jumlah makan per hari:</label>
-              {isEditingSchedule ? (
-                <input
-                  type="number"
-                  min={1}
-                  max={6}
-                  className="w-16 p-1 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
-                  value={editableMealsPerDay}
-                  onChange={e => handleMealsPerDayChange(e.target.value)}
-                  disabled={loading}
-                />
-              ) : (
-                <input
-                  type="number"
-                  min={1}
-                  max={6}
-                  className="w-16 p-1 border rounded bg-backdrop text-main cursor-not-allowed"
-                  value={mealsPerDay}
-                  readOnly
-                  tabIndex={-1}
-                  style={{ pointerEvents: 'none' }}
-                />
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {isEditingSchedule ? (
-                Array.from({ length: Number(editableMealsPerDay) || 0 }).map((_, idx) => (
-                  <div key={idx} className="flex flex-col items-start">
+              {isEditingProfile ? (
+                <div className="mt-2 space-y-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-semibold text-main mb-1">Nama:</label>
                     <input
                       type="text"
-                      className="mb-1 px-2 py-1 border rounded text-xs font-medium text-main bg-backdrop focus:ring-2 focus:ring-main focus:border-main"
-                      value={editableMealNames[idx] || ""}
-                      onChange={e => handleMealNameChange(idx, e.target.value)}
-                      placeholder={`Nama Makan ${idx+1}`}
-                      disabled={loading}
-                    />
-                    <input
-                      type="time"
-                      className="p-1 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
-                      value={editableMealTimes[idx] || ""}
-                      onChange={e => handleScheduleInputChange(idx, e.target.value)}
+                      id="name"
+                      name="name"
+                      value={editableProfile.name}
+                      onChange={handleProfileInputChange}
+                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main text-sm"
                       disabled={loading}
                     />
                   </div>
-                ))
-              ) : (
-                Array.from({ length: mealsPerDay }).map((_, idx) => (
-                  <div key={idx} className="flex flex-col items-start">
-                    <span className="text-xs text-main font-medium mb-1">
-                      {mealNames[idx] || defaultMealNames[idx] || `Meal ${idx+1}`}
-                    </span>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-semibold text-main mb-1">Email:</label>
                     <input
-                      type="time"
-                      className="p-1 border rounded bg-backdrop text-main cursor-not-allowed"
-                      value={mealTimes[idx] || ""}
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={editableProfile.email}
+                      onChange={handleProfileInputChange}
+                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main text-sm"
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-2 text-sm">
+                  <div className="flex items-center mb-2">
+                    <span className="font-semibold text-main w-20 mr-2">Nama:</span>
+                    <span className="text-gray-700">{profile.name || <span className="italic text-gray-400">- Tidak ada data -</span>}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="font-semibold text-main w-20 mr-2">Email:</span>
+                    <span className="text-gray-700">{profile.email || <span className="italic text-gray-400">- Tidak ada data -</span>}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Card: Jadwal Makan */}
+          <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row items-start gap-4 md:gap-6">
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
+                <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </div>
+            </div>
+            <div className="flex-1 w-full">
+              <div className="flex justify-between items-center mb-1">
+                <h2 className="text-xl font-bold text-main">Jadwal Makan</h2>
+                {!isEditingSchedule ? (
+                  <button
+                    onClick={handleEditScheduleToggle}
+                    className="bg-main text-white px-3 py-1 rounded-md hover:bg-secondary text-sm shadow transition-colors duration-200"
+                    disabled={loading}
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveSchedule}
+                      className="bg-altGreen text-black px-3 py-1 rounded-md hover:bg-altGreen/50 text-sm shadow transition-colors duration-200"
+                      disabled={loading}
+                    >
+                      {loading ? "Menyimpan..." : "Simpan"}
+                    </button>
+                    <button
+                      onClick={handleEditScheduleToggle}
+                      className="bg-gray-300 text-black px-3 py-1 rounded-md hover:bg-gray-400 text-sm shadow transition-colors duration-200"
+                      disabled={loading}
+                    >
+                      Batal
+                    </button>
+                  </div>
+                )}
+              </div>
+              {scheduleUpdateStatus.message && (
+                <div className={`mb-2 text-sm font-medium ${scheduleUpdateStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                  {scheduleUpdateStatus.message}
+                </div>
+              )}
+              <div className="flex items-center mb-2">
+                <label className="mr-2 font-medium text-main">Jumlah makan per hari:</label>
+                {isEditingSchedule ? (
+                  <input
+                    type="number"
+                    min={1}
+                    max={6}
+                    className="w-16 p-1 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                    value={editableMealsPerDay}
+                    onChange={e => handleMealsPerDayChange(e.target.value)}
+                    disabled={loading}
+                  />
+                ) : (
+                  <input
+                    type="number"
+                    min={1}
+                    max={6}
+                    className="w-16 p-1 border rounded bg-backdrop text-main cursor-not-allowed"
+                    value={mealsPerDay}
+                    readOnly
+                    tabIndex={-1}
+                    style={{ pointerEvents: 'none' }}
+                  />
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {isEditingSchedule ? (
+                  Array.from({ length: Number(editableMealsPerDay) || 0 }).map((_, idx) => (
+                    <div key={idx} className="flex flex-col items-start">
+                      <input
+                        type="text"
+                        className="mb-1 px-2 py-1 border rounded text-xs font-medium text-main bg-backdrop focus:ring-2 focus:ring-main focus:border-main"
+                        value={editableMealNames[idx] || ""}
+                        onChange={e => handleMealNameChange(idx, e.target.value)}
+                        placeholder={`Nama Makan ${idx+1}`}
+                        disabled={loading}
+                      />
+                      <input
+                        type="time"
+                        className="p-1 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                        value={editableMealTimes[idx] || ""}
+                        onChange={e => handleScheduleInputChange(idx, e.target.value)}
+                        disabled={loading}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  Array.from({ length: mealsPerDay }).map((_, idx) => (
+                    <div key={idx} className="flex flex-col items-start">
+                      <span className="text-xs text-main font-medium mb-1">
+                        {mealNames[idx] || defaultMealNames[idx] || `Meal ${idx+1}`}
+                      </span>
+                      <input
+                        type="time"
+                        className="p-1 border rounded bg-backdrop text-main cursor-not-allowed"
+                        value={mealTimes[idx] || ""}
+                        readOnly
+                        tabIndex={-1}
+                        style={{ pointerEvents: 'none' }}
+                      />
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Card: Kebutuhan Nutrisi */}
+          <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row items-start gap-4 md:gap-6">
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
+                <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 1.343-3 3 0 1.306.835 2.417 2 2.83V17a1 1 0 102 0v-3.17c1.165-.413 2-1.524 2-2.83 0-1.657-1.343-3-3-3z" /></svg>
+              </div>
+            </div>
+            <div className="flex-1 w-full">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-main">Kebutuhan Nutrisi</h2>
+                {!isEditingNutrition ? (
+                  <button
+                    onClick={handleEditNutritionToggle}
+                    className="bg-main text-white px-3 py-1 rounded-md hover:bg-secondary text-sm shadow transition-colors duration-200"
+                    disabled={loading}
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveNutrition}
+                      className="bg-altGreen text-black px-3 py-1 rounded-md hover:bg-altGreen/50 text-sm shadow transition-colors duration-200"
+                      disabled={loading}
+                    >
+                      {loading ? 'Menyimpan...' : 'Simpan'}
+                    </button>
+                    <button
+                      onClick={handleEditNutritionToggle}
+                      className="bg-gray-300 text-black px-3 py-1 rounded-md hover:bg-gray-400 text-sm shadow transition-colors duration-200"
+                      disabled={loading}
+                    >
+                      Batal
+                    </button>
+                  </div>
+                )}
+              </div>
+              {nutritionUpdateStatus.message && (
+                <div className={`mb-2 text-sm font-medium ${nutritionUpdateStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                  {nutritionUpdateStatus.message}
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-main mb-1">Kalori</label>
+                  {isEditingNutrition ? (
+                    <input
+                      type="number"
+                      name="calories"
+                      placeholder="Kalori"
+                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                      value={editableNutrition.calories}
+                      onChange={handleNutritionInputChange}
+                      disabled={loading}
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                      value={nutrition.calories}
                       readOnly
                       tabIndex={-1}
                       style={{ pointerEvents: 'none' }}
                     />
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Card: Kebutuhan Nutrisi */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 flex items-center gap-6">
-          <div className="flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
-              <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 1.343-3 3 0 1.306.835 2.417 2 2.83V17a1 1 0 102 0v-3.17c1.165-.413 2-1.524 2-2.83 0-1.657-1.343-3-3-3z" /></svg>
-            </div>
-          </div>
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-main">Kebutuhan Nutrisi</h2>
-              {!isEditingNutrition ? (
-                <button
-                  onClick={handleEditNutritionToggle}
-                  className="bg-main text-white px-3 py-1 rounded-md hover:bg-secondary text-sm shadow transition-colors duration-200"
-                  disabled={loading}
-                >
-                  Edit
-                </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSaveNutrition}
-                    className="bg-altGreen text-black px-3 py-1 rounded-md hover:bg-altGreen/50 text-sm shadow transition-colors duration-200"
-                    disabled={loading}
-                  >
-                    {loading ? 'Menyimpan...' : 'Simpan'}
-                  </button>
-                  <button
-                    onClick={handleEditNutritionToggle}
-                    className="bg-gray-300 text-black px-3 py-1 rounded-md hover:bg-gray-400 text-sm shadow transition-colors duration-200"
-                    disabled={loading}
-                  >
-                    Batal
-                  </button>
+                  )}
                 </div>
-              )}
-            </div>
-            {nutritionUpdateStatus.message && (
-              <div className={`mb-2 text-sm font-medium ${nutritionUpdateStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                {nutritionUpdateStatus.message}
-              </div>
-            )}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-main mb-1">Kalori</label>
-                {isEditingNutrition ? (
-                  <input
-                    type="number"
-                    name="calories"
-                    placeholder="Kalori"
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
-                    value={editableNutrition.calories}
-                    onChange={handleNutritionInputChange}
-                    disabled={loading}
-                  />
-                ) : (
-                  <input
-                    type="number"
-                    className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
-                    value={nutrition.calories}
-                    readOnly
-                    tabIndex={-1}
-                    style={{ pointerEvents: 'none' }}
-                  />
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-main mb-1">Protein (g)</label>
-                {isEditingNutrition ? (
-                  <input
-                    type="number"
-                    name="protein"
-                    placeholder="Protein (g)"
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
-                    value={editableNutrition.protein}
-                    onChange={handleNutritionInputChange}
-                    disabled={loading}
-                  />
-                ) : (
-                  <input
-                    type="number"
-                    className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
-                    value={nutrition.protein}
-                    readOnly
-                    tabIndex={-1}
-                    style={{ pointerEvents: 'none' }}
-                  />
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-main mb-1">Lemak (g)</label>
-                {isEditingNutrition ? (
-                  <input
-                    type="number"
-                    name="fat"
-                    placeholder="Lemak (g)"
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
-                    value={editableNutrition.fat}
-                    onChange={handleNutritionInputChange}
-                    disabled={loading}
-                  />
-                ) : (
-                  <input
-                    type="number"
-                    className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
-                    value={nutrition.fat}
-                    readOnly
-                    tabIndex={-1}
-                    style={{ pointerEvents: 'none' }}
-                  />
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-main mb-1">Karbohidrat (g)</label>
-                {isEditingNutrition ? (
-                  <input
-                    type="number"
-                    name="carbs"
-                    placeholder="Karbohidrat (g)"
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
-                    value={editableNutrition.carbs}
-                    onChange={handleNutritionInputChange}
-                    disabled={loading}
-                  />
-                ) : (
-                  <input
-                    type="number"
-                    className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
-                    value={nutrition.carbs}
-                    readOnly
-                    tabIndex={-1}
-                    style={{ pointerEvents: 'none' }}
-                  />
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-main mb-1">Protein (g)</label>
+                  {isEditingNutrition ? (
+                    <input
+                      type="number"
+                      name="protein"
+                      placeholder="Protein (g)"
+                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                      value={editableNutrition.protein}
+                      onChange={handleNutritionInputChange}
+                      disabled={loading}
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                      value={nutrition.protein}
+                      readOnly
+                      tabIndex={-1}
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-main mb-1">Lemak (g)</label>
+                  {isEditingNutrition ? (
+                    <input
+                      type="number"
+                      name="fat"
+                      placeholder="Lemak (g)"
+                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                      value={editableNutrition.fat}
+                      onChange={handleNutritionInputChange}
+                      disabled={loading}
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                      value={nutrition.fat}
+                      readOnly
+                      tabIndex={-1}
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-main mb-1">Karbohidrat (g)</label>
+                  {isEditingNutrition ? (
+                    <input
+                      type="number"
+                      name="carbs"
+                      placeholder="Karbohidrat (g)"
+                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                      value={editableNutrition.carbs}
+                      onChange={handleNutritionInputChange}
+                      disabled={loading}
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                      value={nutrition.carbs}
+                      readOnly
+                      tabIndex={-1}
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-      
+        
+        </div>
       </div>
     </div>
   );
