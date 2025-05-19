@@ -1,71 +1,607 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 export default function Profile() {
   const [mealsPerDay, setMealsPerDay] = useState(3);
   const [mealTimes, setMealTimes] = useState(["07:00", "12:00", "19:00"]);
   const [nutrition, setNutrition] = useState({ calories: 2000, protein: 60, fat: 50, carbs: 250 });
+  const [profile, setProfile] = useState({ name: "", email: "" });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editableProfile, setEditableProfile] = useState({ name: "", email: "" });
+  const [profileUpdateStatus, setProfileUpdateStatus] = useState({ type: '', message: '' });
+  const [isEditingSchedule, setIsEditingSchedule] = useState(false);
+  const [editableMealTimes, setEditableMealTimes] = useState(["07:00", "12:00", "19:00"]);
+  const [editableMealsPerDay, setEditableMealsPerDay] = useState(3);
+  const [scheduleUpdateStatus, setScheduleUpdateStatus] = useState({ type: '', message: '' });
+  const [isEditingNutrition, setIsEditingNutrition] = useState(false);
+  const [editableNutrition, setEditableNutrition] = useState({ calories: 2000, protein: 60, fat: 50, carbs: 250 });
+  const [nutritionUpdateStatus, setNutritionUpdateStatus] = useState({ type: '', message: '' });
+  const defaultMealNames = ["Sarapan", "Makan Siang", "Makan Malam", "Snack 1", "Snack 2", "Snack 3"];
+  const [editableMealNames, setEditableMealNames] = useState(defaultMealNames.slice(0, 3));
+  const [mealNames, setMealNames] = useState(defaultMealNames.slice(0, 3));
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setLoading(true);
+    api.get("/api/users/profile")
+      .then(res => {
+        const data = res.data;
+        setProfile({ name: data.name, email: data.email });
+        setEditableProfile({ name: data.name, email: data.email });
+        // Handle meal_schedule dynamically
+        const schedule = data.meal_schedule || {};
+        let mealNamesArr = [];
+        let mealTimesArr = [];
+        if (Object.keys(schedule).length > 0) {
+          // Convert to array of [name, time], sort by time
+          const sortedMeals = Object.entries(schedule)
+            .filter(([_, time]) => !!time)
+            .sort((a, b) => (a[1] > b[1] ? 1 : a[1] < b[1] ? -1 : 0));
+          mealNamesArr = sortedMeals.map(([name]) => name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+          mealTimesArr = sortedMeals.map(([_, time]) => time);
+          setMealsPerDay(mealNamesArr.length);
+          setMealTimes(mealTimesArr);
+          setMealNames(mealNamesArr);
+        } else {
+          setMealsPerDay(3);
+          setMealTimes(["07:00", "12:00", "19:00"]);
+          setMealNames(defaultMealNames.slice(0, 3));
+        }
+        setNutrition(data.daily_nutrition_goals || { calories: 2000, protein: 60, fat: 50, carbs: 250 });
+        setError("");
+      })
+      .catch(err => {
+        setError("Gagal mengambil data profil. Pastikan Anda sudah login dan server berjalan.");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Ensure mealTimes always matches mealsPerDay
+  useEffect(() => {
+    setMealTimes(prev => {
+      const arr = [...prev];
+      if (arr.length < mealsPerDay) {
+        return arr.concat(Array(mealsPerDay - arr.length).fill(""));
+      } else if (arr.length > mealsPerDay) {
+        return arr.slice(0, mealsPerDay);
+      }
+      return arr;
+    });
+  }, [mealsPerDay]);
+
+  useEffect(() => {
+    setEditableMealTimes([...mealTimes]);
+    setEditableMealsPerDay(mealsPerDay);
+    setEditableMealNames(
+      Array.from({ length: mealsPerDay }, (_, idx) => mealNames[idx] || defaultMealNames[idx] || `Meal ${idx + 1}`)
+    );
+  }, [mealTimes, mealsPerDay, mealNames]);
+
+  useEffect(() => {
+    setEditableNutrition({ ...nutrition });
+  }, [nutrition]);
+
+  const handleEditProfileToggle = () => {
+    if (!isEditingProfile) {
+      // Entering edit mode, ensure editableProfile is current with actual profile data
+      setEditableProfile({ name: profile.name, email: profile.email });
+    }
+    setIsEditingProfile(!isEditingProfile);
+  };
+
+  const handleProfileInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditableProfile(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveProfile = () => {
+    setLoading(true);
+    setProfileUpdateStatus({ type: '', message: '' });
+    api.put("/api/users/profile", {
+      name: editableProfile.name,
+      email: editableProfile.email,
+    })
+    .then(res => {
+      const updatedUserData = res.data; // API returns the full updated user object
+      setProfile({ name: updatedUserData.name, email: updatedUserData.email });
+      setEditableProfile({ name: updatedUserData.name, email: updatedUserData.email });
+      if (updatedUserData.meal_schedule) {
+        const schedule = updatedUserData.meal_schedule;
+        const times = [schedule.breakfast, schedule.lunch, schedule.dinner].filter(Boolean);
+        setMealsPerDay(times.length || 3);
+        setMealTimes(times.length ? times : ["07:00", "12:00", "19:00"]);
+      }
+      if (updatedUserData.daily_nutrition_goals) {
+        setNutrition(updatedUserData.daily_nutrition_goals);
+      }
+      setIsEditingProfile(false);
+      setError("");
+      setProfileUpdateStatus({ type: 'success', message: 'Profil berhasil diperbarui.' });
+    })
+    .catch(err => {
+      console.error("Error updating profile:", err);
+      setError("Gagal menyimpan perubahan profil. Periksa konsol untuk detail.");
+      setProfileUpdateStatus({ type: 'error', message: 'Gagal memperbarui profil.' });
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  };
+
+  const handleEditScheduleToggle = () => {
+    if (!isEditingSchedule) {
+      setEditableMealTimes([...mealTimes]);
+      setEditableMealsPerDay(mealsPerDay);
+      setEditableMealNames(
+        Array.from({ length: mealsPerDay }, (_, idx) => mealNames[idx] || defaultMealNames[idx] || `Meal ${idx + 1}`)
+      );
+    }
+    setIsEditingSchedule(!isEditingSchedule);
+    setScheduleUpdateStatus({ type: '', message: '' });
+  };
+
+  const handleScheduleInputChange = (idx, value) => {
+    setEditableMealTimes(prev => {
+      const arr = [...prev];
+      arr[idx] = value;
+      return arr;
+    });
+  };
+
+  const handleMealNameChange = (idx, value) => {
+    setEditableMealNames(prev => {
+      const arr = [...prev];
+      arr[idx] = value;
+      return arr;
+    });
+  };
+
+  const handleMealsPerDayChange = (val) => {
+    // Allow empty string for typing, but clamp only if valid
+    if (val === "") {
+      setEditableMealsPerDay("");
+      setEditableMealTimes([]);
+      setEditableMealNames([]);
+      return;
+    }
+    const num = Number(val);
+    if (!isNaN(num) && num >= 1 && num <= 6) {
+      setEditableMealsPerDay(num);
+      setEditableMealTimes(prev => {
+        const arr = [...prev];
+        if (arr.length < num) {
+          return arr.concat(Array(num - arr.length).fill(""));
+        } else if (arr.length > num) {
+          return arr.slice(0, num);
+        }
+        return arr;
+      });
+      setEditableMealNames(prev => {
+        const arr = [...prev];
+        if (arr.length < num) {
+          return arr.concat(
+            Array.from({ length: num - arr.length }, (_, idx) => defaultMealNames[arr.length + idx] || `Meal ${arr.length + idx + 1}`)
+          );
+        } else if (arr.length > num) {
+          return arr.slice(0, num);
+        }
+        return arr;
+      });
+    }
+  };
+
+  const handleSaveSchedule = () => {
+    setLoading(true);
+    setScheduleUpdateStatus({ type: '', message: '' });
+    // Map editableMealTimes to meal_schedule with custom names
+    const meal_schedule = {};
+    for (let i = 0; i < editableMealsPerDay; i++) {
+      const key = (editableMealNames[i] || `Meal${i+1}`).toLowerCase().replace(/\s+/g, '_');
+      meal_schedule[key] = editableMealTimes[i];
+    }
+    api.put("/api/users/meal-schedule", { meal_schedule })
+      .then(res => {
+        setMealTimes(editableMealTimes);
+        setMealsPerDay(Number(editableMealsPerDay));
+        setMealNames([...editableMealNames]); // <-- update mealNames to the saved names
+        setIsEditingSchedule(false);
+        setScheduleUpdateStatus({ type: 'success', message: 'Jadwal makan berhasil diperbarui.' });
+      })
+      .catch(err => {
+        setScheduleUpdateStatus({ type: 'error', message: 'Gagal memperbarui jadwal makan.' });
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const handleEditNutritionToggle = () => {
+    if (!isEditingNutrition) {
+      setEditableNutrition({ ...nutrition });
+    }
+    setIsEditingNutrition(!isEditingNutrition);
+    setNutritionUpdateStatus({ type: '', message: '' });
+  };
+
+  const handleNutritionInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditableNutrition(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveNutrition = () => {
+    setLoading(true);
+    setNutritionUpdateStatus({ type: '', message: '' });
+    api.put('/api/users/nutrition-goals', {
+      daily_nutrition_goals: {
+        calories: Number(editableNutrition.calories),
+        protein: Number(editableNutrition.protein),
+        fat: Number(editableNutrition.fat),
+        carbs: Number(editableNutrition.carbs),
+      },
+    })
+      .then(res => {
+        const updated = res.data.daily_nutrition_goals || editableNutrition;
+        setNutrition(updated);
+        setIsEditingNutrition(false);
+        setNutritionUpdateStatus({ type: 'success', message: 'Kebutuhan nutrisi berhasil diperbarui.' });
+      })
+      .catch(() => {
+        setNutritionUpdateStatus({ type: 'error', message: 'Gagal memperbarui kebutuhan nutrisi.' });
+      })
+      .finally(() => setLoading(false));
+  };
+
+  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
-    <div className="p-8 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Profil & Preferensi</h1>
-      <div className="bg-white p-6 rounded shadow mb-6">
-        <h2 className="font-semibold mb-2">Jadwal Makan</h2>
-        <label>Jumlah makan per hari:</label>
-        <input
-          type="number"
-          min={1}
-          max={6}
-          className="w-16 ml-2 mb-2 p-1 border rounded"
-          value={mealsPerDay}
-          onChange={e => setMealsPerDay(Number(e.target.value))}
-        />
-        <div>
-          {Array.from({ length: mealsPerDay }).map((_, idx) => (
-            <input
-              key={idx}
-              type="time"
-              className="mr-2 mb-2 p-1 border rounded"
-              value={mealTimes[idx] || ""}
-              onChange={e => {
-                const newTimes = [...mealTimes];
-                newTimes[idx] = e.target.value;
-                setMealTimes(newTimes);
-              }}
-            />
-          ))}
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-altGreen p-6 md:p-10 flex justify-center items-center">
+      <div className="absolute left-6 top-6">
+        <button
+          onClick={() => navigate("/")}
+          className="w-14 h-14 rounded-full bg-main flex items-center justify-center shadow-lg hover:bg-secondary focus:bg-secondary transition-colors duration-200 outline-none focus:ring-4 focus:ring-main/30 group"
+          aria-label="Home"
+        >
+          <svg className="w-7 h-7 text-white group-hover:text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10" />
+          </svg>
+        </button>
       </div>
-      <div className="bg-white p-6 rounded shadow">
-        <h2 className="font-semibold mb-2">Kebutuhan Nutrisi</h2>
-        <input
-          type="number"
-          placeholder="Kalori"
-          className="w-full mb-2 p-2 border rounded"
-          value={nutrition.calories}
-          onChange={e => setNutrition({ ...nutrition, calories: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Protein (g)"
-          className="w-full mb-2 p-2 border rounded"
-          value={nutrition.protein}
-          onChange={e => setNutrition({ ...nutrition, protein: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Lemak (g)"
-          className="w-full mb-2 p-2 border rounded"
-          value={nutrition.fat}
-          onChange={e => setNutrition({ ...nutrition, fat: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Karbohidrat (g)"
-          className="w-full mb-2 p-2 border rounded"
-          value={nutrition.carbs}
-          onChange={e => setNutrition({ ...nutrition, carbs: e.target.value })}
-        />
-        <button className="w-full bg-blue-500 text-white py-2 rounded mt-2">Simpan</button>
+      <div className="max-w-3xl mx-auto flex flex-col gap-8">
+        {/* Card: Informasi Pribadi */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 flex items-start gap-6"> {/* Changed items-center to items-start for better alignment with multiline edit form */}
+          <div className="flex-shrink-0">
+            <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
+              <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-main">Informasi Pribadi</h2>
+              {!isEditingProfile ? (
+                <button
+                  onClick={handleEditProfileToggle}
+                  className="bg-main text-white px-3 py-1 rounded-md hover:bg-secondary text-sm shadow transition-colors ease-in-out duration-200"
+                  disabled={loading}
+                >
+                  Edit
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSaveProfile}
+                    className="bg-altGreen text-black px-3 py-1 rounded-md hover:bg-altGreen/50 text-sm shadow transition-colors ease-in-out duration-200"
+                    disabled={loading}
+                  >
+                    {loading ? "Menyimpan..." : "Simpan"}
+                  </button>
+                  <button
+                    onClick={handleEditProfileToggle}
+                    className="bg-gray-300 text-black px-3 py-1 rounded-md hover:bg-gray-400 text-sm shadow transition-colors ease-in-out duration-200"
+                    disabled={loading}
+                  >
+                    Batal
+                  </button>
+                </div>
+              )}
+            </div>
+            {profileUpdateStatus.message && (
+              <div className={`mb-2 text-sm font-medium ${profileUpdateStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                {profileUpdateStatus.message}
+              </div>
+            )}
+            {isEditingProfile ? (
+              <div className="mt-2 space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold text-main mb-1">Nama:</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={editableProfile.name}
+                    onChange={handleProfileInputChange}
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main text-sm"
+                    disabled={loading}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold text-main mb-1">Email:</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={editableProfile.email}
+                    onChange={handleProfileInputChange}
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main text-sm"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="mt-2 text-sm">
+                <div className="flex items-center mb-2">
+                  <span className="font-semibold text-main w-20 mr-2">Nama:</span>
+                  <span className="text-gray-700">{profile.name || <span className="italic text-gray-400">- Tidak ada data -</span>}</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="font-semibold text-main w-20 mr-2">Email:</span>
+                  <span className="text-gray-700">{profile.email || <span className="italic text-gray-400">- Tidak ada data -</span>}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Card: Jadwal Makan */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 flex items-center gap-6">
+          <div className="flex-shrink-0">
+            <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
+              <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="flex justify-between items-center mb-1">
+              <h2 className="text-xl font-bold text-main">Jadwal Makan</h2>
+              {!isEditingSchedule ? (
+                <button
+                  onClick={handleEditScheduleToggle}
+                  className="bg-main text-white px-3 py-1 rounded-md hover:bg-secondary text-sm shadow transition-colors duration-200"
+                  disabled={loading}
+                >
+                  Edit
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSaveSchedule}
+                    className="bg-altGreen text-black px-3 py-1 rounded-md hover:bg-altGreen/50 text-sm shadow transition-colors duration-200"
+                    disabled={loading}
+                  >
+                    {loading ? "Menyimpan..." : "Simpan"}
+                  </button>
+                  <button
+                    onClick={handleEditScheduleToggle}
+                    className="bg-gray-300 text-black px-3 py-1 rounded-md hover:bg-gray-400 text-sm shadow transition-colors duration-200"
+                    disabled={loading}
+                  >
+                    Batal
+                  </button>
+                </div>
+              )}
+            </div>
+            {scheduleUpdateStatus.message && (
+              <div className={`mb-2 text-sm font-medium ${scheduleUpdateStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                {scheduleUpdateStatus.message}
+              </div>
+            )}
+            <div className="flex items-center mb-2">
+              <label className="mr-2 font-medium text-main">Jumlah makan per hari:</label>
+              {isEditingSchedule ? (
+                <input
+                  type="number"
+                  min={1}
+                  max={6}
+                  className="w-16 p-1 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                  value={editableMealsPerDay}
+                  onChange={e => handleMealsPerDayChange(e.target.value)}
+                  disabled={loading}
+                />
+              ) : (
+                <input
+                  type="number"
+                  min={1}
+                  max={6}
+                  className="w-16 p-1 border rounded bg-backdrop text-main cursor-not-allowed"
+                  value={mealsPerDay}
+                  readOnly
+                  tabIndex={-1}
+                  style={{ pointerEvents: 'none' }}
+                />
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {isEditingSchedule ? (
+                Array.from({ length: Number(editableMealsPerDay) || 0 }).map((_, idx) => (
+                  <div key={idx} className="flex flex-col items-start">
+                    <input
+                      type="text"
+                      className="mb-1 px-2 py-1 border rounded text-xs font-medium text-main bg-backdrop focus:ring-2 focus:ring-main focus:border-main"
+                      value={editableMealNames[idx] || ""}
+                      onChange={e => handleMealNameChange(idx, e.target.value)}
+                      placeholder={`Nama Makan ${idx+1}`}
+                      disabled={loading}
+                    />
+                    <input
+                      type="time"
+                      className="p-1 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                      value={editableMealTimes[idx] || ""}
+                      onChange={e => handleScheduleInputChange(idx, e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                ))
+              ) : (
+                Array.from({ length: mealsPerDay }).map((_, idx) => (
+                  <div key={idx} className="flex flex-col items-start">
+                    <span className="text-xs text-main font-medium mb-1">
+                      {mealNames[idx] || defaultMealNames[idx] || `Meal ${idx+1}`}
+                    </span>
+                    <input
+                      type="time"
+                      className="p-1 border rounded bg-backdrop text-main cursor-not-allowed"
+                      value={mealTimes[idx] || ""}
+                      readOnly
+                      tabIndex={-1}
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Card: Kebutuhan Nutrisi */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 flex items-center gap-6">
+          <div className="flex-shrink-0">
+            <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
+              <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 1.343-3 3 0 1.306.835 2.417 2 2.83V17a1 1 0 102 0v-3.17c1.165-.413 2-1.524 2-2.83 0-1.657-1.343-3-3-3z" /></svg>
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-main">Kebutuhan Nutrisi</h2>
+              {!isEditingNutrition ? (
+                <button
+                  onClick={handleEditNutritionToggle}
+                  className="bg-main text-white px-3 py-1 rounded-md hover:bg-secondary text-sm shadow transition-colors duration-200"
+                  disabled={loading}
+                >
+                  Edit
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSaveNutrition}
+                    className="bg-altGreen text-black px-3 py-1 rounded-md hover:bg-altGreen/50 text-sm shadow transition-colors duration-200"
+                    disabled={loading}
+                  >
+                    {loading ? 'Menyimpan...' : 'Simpan'}
+                  </button>
+                  <button
+                    onClick={handleEditNutritionToggle}
+                    className="bg-gray-300 text-black px-3 py-1 rounded-md hover:bg-gray-400 text-sm shadow transition-colors duration-200"
+                    disabled={loading}
+                  >
+                    Batal
+                  </button>
+                </div>
+              )}
+            </div>
+            {nutritionUpdateStatus.message && (
+              <div className={`mb-2 text-sm font-medium ${nutritionUpdateStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                {nutritionUpdateStatus.message}
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-main mb-1">Kalori</label>
+                {isEditingNutrition ? (
+                  <input
+                    type="number"
+                    name="calories"
+                    placeholder="Kalori"
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                    value={editableNutrition.calories}
+                    onChange={handleNutritionInputChange}
+                    disabled={loading}
+                  />
+                ) : (
+                  <input
+                    type="number"
+                    className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                    value={nutrition.calories}
+                    readOnly
+                    tabIndex={-1}
+                    style={{ pointerEvents: 'none' }}
+                  />
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-main mb-1">Protein (g)</label>
+                {isEditingNutrition ? (
+                  <input
+                    type="number"
+                    name="protein"
+                    placeholder="Protein (g)"
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                    value={editableNutrition.protein}
+                    onChange={handleNutritionInputChange}
+                    disabled={loading}
+                  />
+                ) : (
+                  <input
+                    type="number"
+                    className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                    value={nutrition.protein}
+                    readOnly
+                    tabIndex={-1}
+                    style={{ pointerEvents: 'none' }}
+                  />
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-main mb-1">Lemak (g)</label>
+                {isEditingNutrition ? (
+                  <input
+                    type="number"
+                    name="fat"
+                    placeholder="Lemak (g)"
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                    value={editableNutrition.fat}
+                    onChange={handleNutritionInputChange}
+                    disabled={loading}
+                  />
+                ) : (
+                  <input
+                    type="number"
+                    className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                    value={nutrition.fat}
+                    readOnly
+                    tabIndex={-1}
+                    style={{ pointerEvents: 'none' }}
+                  />
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-main mb-1">Karbohidrat (g)</label>
+                {isEditingNutrition ? (
+                  <input
+                    type="number"
+                    name="carbs"
+                    placeholder="Karbohidrat (g)"
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                    value={editableNutrition.carbs}
+                    onChange={handleNutritionInputChange}
+                    disabled={loading}
+                  />
+                ) : (
+                  <input
+                    type="number"
+                    className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                    value={nutrition.carbs}
+                    readOnly
+                    tabIndex={-1}
+                    style={{ pointerEvents: 'none' }}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      
       </div>
     </div>
   );
