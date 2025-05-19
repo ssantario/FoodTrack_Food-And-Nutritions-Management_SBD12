@@ -260,7 +260,7 @@ export default function Profile() {
       <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl p-3 md:p-8 border border-gray-200/80 flex flex-col gap-4 md:gap-8">
         <div className="absolute left-4 md:left-6 top-4 md:top-6">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
             className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-main flex items-center justify-center shadow-lg hover:bg-secondary focus:bg-secondary transition-colors duration-200 outline-none focus:ring-4 focus:ring-main/30 group"
             aria-label="Home"
           >

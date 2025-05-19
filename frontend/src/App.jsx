@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import FoodRegister from "./pages/FoodRegister";
 import Profile from "./pages/Profile";
 import FoodList from "./pages/FoodList";
+import History from "./pages/History";
 import "./App.css";
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/food-list" element={<FoodList />} />
+        <Route path="/history" element={<History />} />
         {/* <Route path="/FoodRegister" element={<FoodRegister />} /> */}
         <Route path="/profile" element={<Profile />} />
       </Routes>

@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import api from "../api/axios";
 import foodLogo from "../assets/apple-svgrepo-com.svg";
 import foodLogoWhite from "../assets/appleWhite.svg"
 
@@ -62,18 +63,86 @@ const AppNavbar = () => {
 
 
 export default function Dashboard() {
-  const dailyCalories = 1850;
-  const targetCalories = 2200;
-  const calorieProgress = Math.min((dailyCalories / targetCalories) * 100, 100);
+  const [profile, setProfile] = useState(null);
+  const [mealsToday, setMealsToday] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Fetch profile and today's meals
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const [profileRes, mealsRes] = await Promise.all([
+          api.get("/api/users/profile"),
+          api.get("/api/meals"),
+        ]);
+        setProfile(profileRes.data);
+        // Filter meals for today only
+        const today = new Date().toISOString().slice(0, 10);
+        setMealsToday(
+          (mealsRes.data || []).filter(m => m.meal_time && m.meal_time.slice(0, 10) === today)
+        );
+      } catch (err) {
+        setError("Gagal memuat data dashboard.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  // Calculate summary
+  let totalCalories = 0, totalProtein = 0, totalFat = 0, totalCarbs = 0;
+  if (mealsToday.length > 0) {
+    mealsToday.forEach(meal => {
+      if (Array.isArray(meal.food_items)) {
+        meal.food_items.forEach(item => {
+          totalCalories += Number(item.calories) * Number(item.quantity);
+          totalProtein += Number(item.protein) * Number(item.quantity);
+          totalFat += Number(item.fat) * Number(item.quantity);
+          totalCarbs += Number(item.carbs) * Number(item.quantity);
+        });
+      }
+    });
+  }
+
+  // Get targets from profile
+  const targetCalories = profile?.daily_nutrition_goals?.calories || 2000;
+  const targetProtein = profile?.daily_nutrition_goals?.protein || 60;
+  const targetFat = profile?.daily_nutrition_goals?.fat || 50;
+  const targetCarbs = profile?.daily_nutrition_goals?.carbs || 250;
+  const mealSchedule = profile?.meal_schedule || {};
+  const totalMealsTarget = Object.keys(mealSchedule).length || 3;
+  const mealNames = Object.keys(mealSchedule).map(k => k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+
+  // Progress
+  const calorieProgress = Math.min((totalCalories / targetCalories) * 100, 100);
   const nutrition = {
-    protein: { current: 60, target: 70 },
-    fat: { current: 50, target: 60 },
-    carbs: { current: 200, target: 250 },
+    protein: { current: totalProtein, target: targetProtein },
+    fat: { current: totalFat, target: targetFat },
+    carbs: { current: totalCarbs, target: targetCarbs },
   };
+  const mealLog = { eaten: mealsToday.length, total: totalMealsTarget };
 
-  const mealLog = { eaten: 3, total: 4 };
-
+  // Calculate daily score
+  let score = 0;
+  if (totalCalories >= targetCalories * 0.95 && totalCalories <= targetCalories * 1.05) score++;
+  if (
+    (totalProtein >= targetProtein * 0.95 && totalProtein <= targetProtein * 1.05) ||
+    (totalFat >= targetFat * 0.95 && totalFat <= targetFat * 1.05) ||
+    (totalCarbs >= targetCarbs * 0.95 && totalCarbs <= targetCarbs * 1.05)
+  ) score++;
+  if (
+    (totalProtein >= targetProtein * 0.95 && totalProtein <= targetProtein * 1.05) &&
+    (totalFat >= targetFat * 0.95 && totalFat <= targetFat * 1.05) &&
+    (totalCarbs >= targetCarbs * 0.95 && totalCarbs <= targetCarbs * 1.05)
+  ) score++;
+  // Score label
+  let scoreLabel = "Decent", scoreColor = "bg-yellow-100 text-yellow-800 border-yellow-300";
+  if (score === 2) { scoreLabel = "Good"; scoreColor = "bg-blue-100 text-blue-800 border-blue-300"; }
+  if (score === 3) { scoreLabel = "Perfect"; scoreColor = "bg-green-100 text-green-800 border-green-300"; }
 
   const nutritionTips = [
     "Pastikan untuk minum setidaknya 8 gelas air hari ini untuk menjaga hidrasi optimal.",
@@ -97,6 +166,10 @@ export default function Dashboard() {
     setRandomTip(nutritionTips[idx]);
   }, []);
 
+  // Replace static values with dynamic ones
+  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
+
   return (
     <>
       <AppNavbar />
@@ -107,7 +180,6 @@ export default function Dashboard() {
             Selamat datang kembali! Pantau progres nutrisi harian Anda dengan mudah.
           </p>
         </header>
-
         <div className="mb-8 md:mb-12 flex flex-col md:flex-row justify-center md:justify-start gap-3 md:gap-0">
           <Link to="/meal-register">
             <button
@@ -118,7 +190,6 @@ export default function Dashboard() {
             </button>
           </Link>
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
           {/* Card Kalori Hari Ini */}
           <div className="bg-white p-7 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/80 transform hover:scale-[1.02]">
@@ -131,7 +202,7 @@ export default function Dashboard() {
                 <p className="text-md text-slate-500">Target: {targetCalories} kcal</p>
               </div>
             </div>
-            <p className="text-5xl font-bold text-[#41897c] mb-3">{dailyCalories} <span className="text-3xl text-slate-600">kcal</span></p>
+            <p className="text-5xl font-bold text-[#41897c] mb-3">{totalCalories} <span className="text-3xl text-slate-600">kcal</span></p>
             <div className="w-full bg-gray-200 rounded-full h-3.5">
               <div
                 className="bg-gradient-to-r from-[#66bb6a] to-[#43a047] h-3.5 rounded-full transition-all duration-500 ease-out"
@@ -192,9 +263,27 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Overall Score Section */}
+        <div className="mt-10 flex justify-center">
+          <div className={`w-full max-w-2xl bg-white p-10 rounded-3xl shadow-2xl border-4 font-bold flex flex-col items-center justify-center ${scoreColor} ring-4 ring-main/20 transition-all duration-300`}>  
+            <div className="flex items-center gap-4 mb-4">
+              <svg className="w-12 h-12 text-yellow-400 drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.09 6.26L20 9.27l-5 3.64L16.18 20 12 16.77 7.82 20 9 12.91l-5-3.64 5.91-.01z"/></svg>
+              <h2 className="text-3xl md:text-4xl font-extrabold mb-0">Skor Nutrisi Hari Ini</h2>
+            </div>
+            <div className="text-7xl md:text-8xl mb-2 font-extrabold tracking-tight">{score}/3</div>
+            <div className="text-2xl md:text-3xl mb-3 font-bold">{scoreLabel}</div>
+            <div className="text-lg md:text-xl font-normal text-slate-700 text-center">
+              {score === 3 && "Selamat! Semua target nutrisi harian tercapai."}
+              {score === 2 && "Bagus! Hampir semua target nutrisi harian tercapai."}
+              {score === 1 && "Cukup. Masih ada target nutrisi yang belum tercapai."}
+              {score === 0 && "Belum ada target nutrisi yang tercapai hari ini."}
+            </div>
+          </div>
+        </div>
+
         {/* Section Tips Nutrisi (tanpa grafik) */}
         <div className="mt-8 md:mt-12 bg-white p-4 md:p-8 rounded-2xl shadow-xl border border-gray-200/80">
-          <h3 className="text-xl md:text-2xl font-semibold text-slate-800 mb-3 md:mb-4">💡 Tips Nutrisi Hari Ini</h3>
+          <h3 className="text-xl md:text-2xl font-semibold text-slate-800 mb-3 md:mb-4">💡 Tips Nutrisi</h3>
           <div>
             <p className="text-slate-600 leading-relaxed text-sm md:text-md">
               {randomTip}
