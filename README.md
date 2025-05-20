@@ -25,6 +25,9 @@ Users can add their own foods, record what they eat, and track their progress ov
 ## FlowChart
 ![alt text](readme-img/Flowchart.png)
 
+## Client and Server Side Scenario
+![alt text](readme-img/db-client-scenario.png)
+
 # 💻 Installation Guide
 
 Clone this repository
