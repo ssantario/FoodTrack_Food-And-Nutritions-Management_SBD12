@@ -1,6 +1,6 @@
 ![alt text](readme-img/LogoLong.svg)
 
-### Description
+## Description
 FoodTrack
 FoodTrack is a nutrition and food management system designed to help users easily monitor and improve their daily eating habits. The system consists of four main components: User, Profile, and Dashboard.
 
@@ -15,13 +15,15 @@ Users can add their own foods, record what they eat, and track their progress ov
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB) ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens) ![NPM](https://img.shields.io/badge/NPM-%23000000.svg?style=for-the-badge&logo=npm&logoColor=white) ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
 # 📊 Diagrams
-![Flowchart by Rivi](https://i.imgur.com/zDdDuGr.png)
 
 ## UML
+![alt text](readme-img/umlfinpro.drawio.png)
 
 ## ERD
+![alt text](readme-img/ERD.drawio.png)
 
 ## FlowChart
+![alt text](readme-img/Flowchart.png)
 
 # 💻 Installation Guide
 
@@ -63,6 +65,7 @@ git clone https://github.com/ssantario/FoodTrack_Food-And-Nutritions-Management_
    npm install
   ```
 - Create your `.env` file in the front-end root, the same hierarchy as `src`
+  
   ![alt text](readme-img/image-1.png)
 
 - Your .env should contain these variables : 
