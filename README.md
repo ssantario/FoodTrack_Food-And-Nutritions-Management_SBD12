@@ -38,7 +38,8 @@ git clone https://github.com/ssantario/FoodTrack_Food-And-Nutritions-Management_
   ```
   npm run dev
   ```
-- It should look like this : 
+- It should look like this :
+
   ![alt text](readme-img/image.png)
 
 ## Backend
@@ -86,6 +87,7 @@ git clone https://github.com/ssantario/FoodTrack_Food-And-Nutritions-Management_
    npm run dev
   ```
 - It should look like this :
+  
   ![alt text](readme-img/npm-run-dev-success.png)
   
 # 💻 Progress Report (text-based):
