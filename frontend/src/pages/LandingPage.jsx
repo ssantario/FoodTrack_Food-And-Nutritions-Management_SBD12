@@ -122,7 +122,7 @@ export default function LandingPage() {
             <button onClick={() => scrollToSection("mulai")} className="text-gray-300 hover:bg-[#356e62] hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out">Ayo Mulai</button>
           </div>
           {/* Tombol "Join FoodTrack" disamakan dengan "Catat Makanan Baru" di Dashboard */}
-          <Link to="/dashboard">
+          <Link to="/register">
             <button className="bg-gradient-to-r from-[#41897c] to-[#5ab8a5] text-white font-semibold px-5 py-2 rounded-lg shadow-sm hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#5ab8a5] focus:ring-opacity-50">
               Join FoodTrack
             </button>

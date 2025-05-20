@@ -252,26 +252,46 @@ export default function Profile() {
       .finally(() => setLoading(false));
   };
 
+  // Helper untuk validasi field penting
+  const isProfileIncomplete = !profile.name || !profile.email;
+  const isScheduleIncomplete = mealTimes.some(t => !t) || mealNames.some(n => !n);
+  const isNutritionIncomplete =
+    !nutrition.calories || !nutrition.protein || !nutrition.fat || !nutrition.carbs;
+
   if (loading) return <div className="p-8 text-center">Loading...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-altGreen p-3 md:p-10 flex justify-center items-center">
       <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl p-3 md:p-8 border border-gray-200/80 flex flex-col gap-4 md:gap-8">
-        <div className="absolute left-4 md:left-6 top-4 md:top-6">
+        {/* Tombol Dashboard Responsive */}
+        <div className="flex justify-end mb-2">
           <button
             onClick={() => navigate("/dashboard")}
-            className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-main flex items-center justify-center shadow-lg hover:bg-secondary focus:bg-secondary transition-colors duration-200 outline-none focus:ring-4 focus:ring-main/30 group"
-            aria-label="Home"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-main text-white font-semibold shadow hover:bg-secondary transition-colors duration-200 text-sm md:text-base"
           >
-            <svg className="w-6 h-6 md:w-7 md:h-7 text-white group-hover:text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10" />
             </svg>
+            <span className="hidden sm:inline">Kembali ke Dashboard</span>
+            <span className="sm:hidden">Dashboard</span>
           </button>
         </div>
+        {/* Peringatan jika ada data penting yang belum diisi */}
+        {(isProfileIncomplete || isScheduleIncomplete || isNutritionIncomplete) && (
+          <div className="mb-4 p-4 rounded-lg bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 flex items-center gap-2">
+            <svg className="w-6 h-6 text-yellow-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>
+              <b>Perhatian:</b> Ada informasi penting yang belum lengkap. Silakan lengkapi profil, jadwal makan, dan kebutuhan nutrisi Anda!
+            </span>
+          </div>
+        )}
         <div className="flex flex-col gap-4 md:gap-8">
           {/* Card: Informasi Pribadi */}
-          <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row items-start gap-4 md:gap-6">
+          <div className={`bg-white rounded-2xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row items-start gap-4 md:gap-6
+            ${isProfileIncomplete ? "border-2 border-yellow-400" : ""}`}>
             <div className="flex-shrink-0">
               <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
                 <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -279,7 +299,14 @@ export default function Profile() {
             </div>
             <div className="flex-1 w-full">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-main">Informasi Pribadi</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-main">Informasi Pribadi</h2>
+                  {isProfileIncomplete && (
+                    <span className="ml-2 px-2 py-0.5 rounded bg-yellow-200 text-yellow-800 text-xs font-semibold">
+                      Wajib diisi
+                    </span>
+                  )}
+                </div>
                 {!isEditingProfile ? (
                   <button
                     onClick={handleEditProfileToggle}
@@ -343,11 +370,15 @@ export default function Profile() {
                 <div className="mt-2 text-sm">
                   <div className="flex items-center mb-2">
                     <span className="font-semibold text-main w-20 mr-2">Nama:</span>
-                    <span className="text-gray-700">{profile.name || <span className="italic text-gray-400">- Tidak ada data -</span>}</span>
+                    <span className={profile.name ? "text-gray-700" : "italic text-red-500"}>
+                      {profile.name || "Belum diisi"}
+                    </span>
                   </div>
                   <div className="flex items-center">
                     <span className="font-semibold text-main w-20 mr-2">Email:</span>
-                    <span className="text-gray-700">{profile.email || <span className="italic text-gray-400">- Tidak ada data -</span>}</span>
+                    <span className={profile.email ? "text-gray-700" : "italic text-red-500"}>
+                      {profile.email || "Belum diisi"}
+                    </span>
                   </div>
                 </div>
               )}
@@ -355,7 +386,8 @@ export default function Profile() {
           </div>
 
           {/* Card: Jadwal Makan */}
-          <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row items-start gap-4 md:gap-6">
+          <div className={`bg-white rounded-2xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row items-start gap-4 md:gap-6
+            ${isScheduleIncomplete ? "border-2 border-yellow-400" : ""}`}>
             <div className="flex-shrink-0">
               <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
                 <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -363,7 +395,14 @@ export default function Profile() {
             </div>
             <div className="flex-1 w-full">
               <div className="flex justify-between items-center mb-1">
-                <h2 className="text-xl font-bold text-main">Jadwal Makan</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-main">Jadwal Makan</h2>
+                  {isScheduleIncomplete && (
+                    <span className="ml-2 px-2 py-0.5 rounded bg-yellow-200 text-yellow-800 text-xs font-semibold">
+                      Wajib diisi
+                    </span>
+                  )}
+                </div>
                 {!isEditingSchedule ? (
                   <button
                     onClick={handleEditScheduleToggle}
@@ -407,6 +446,7 @@ export default function Profile() {
                     value={editableMealsPerDay}
                     onChange={e => handleMealsPerDayChange(e.target.value)}
                     disabled={loading}
+                    placeholder="Contoh: 3"
                   />
                 ) : (
                   <input
@@ -427,35 +467,46 @@ export default function Profile() {
                     <div key={idx} className="flex flex-col items-start">
                       <input
                         type="text"
-                        className="mb-1 px-2 py-1 border rounded text-xs font-medium text-main bg-backdrop focus:ring-2 focus:ring-main focus:border-main"
+                        className={`mb-1 px-2 py-1 border rounded text-xs font-medium text-main bg-backdrop focus:ring-2 focus:ring-main focus:border-main
+                          ${!editableMealNames[idx] ? "border-red-400 bg-yellow-50" : ""}`}
                         value={editableMealNames[idx] || ""}
                         onChange={e => handleMealNameChange(idx, e.target.value)}
-                        placeholder={`Nama Makan ${idx+1}`}
+                        placeholder={`Nama Makan ${idx+1} (cth: Sarapan)`}
                         disabled={loading}
                       />
                       <input
                         type="time"
-                        className="p-1 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                        className={`p-1 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main
+                          ${!editableMealTimes[idx] ? "border-red-400 bg-yellow-50" : ""}`}
                         value={editableMealTimes[idx] || ""}
                         onChange={e => handleScheduleInputChange(idx, e.target.value)}
                         disabled={loading}
+                        placeholder="Jam (cth: 07:00)"
                       />
+                      {(!editableMealNames[idx] || !editableMealTimes[idx]) && (
+                        <span className="text-xs text-red-500 mt-1">Wajib diisi</span>
+                      )}
                     </div>
                   ))
                 ) : (
                   Array.from({ length: mealsPerDay }).map((_, idx) => (
                     <div key={idx} className="flex flex-col items-start">
-                      <span className="text-xs text-main font-medium mb-1">
-                        {mealNames[idx] || defaultMealNames[idx] || `Meal ${idx+1}`}
+                      <span className={`text-xs font-medium mb-1
+                        ${!mealNames[idx] ? "text-red-500" : "text-main"}`}>
+                        {mealNames[idx] || "Belum diisi"}
                       </span>
                       <input
                         type="time"
-                        className="p-1 border rounded bg-backdrop text-main cursor-not-allowed"
+                        className={`p-1 border rounded bg-backdrop text-main cursor-not-allowed
+                          ${!mealTimes[idx] ? "border-red-400 bg-yellow-50" : ""}`}
                         value={mealTimes[idx] || ""}
                         readOnly
                         tabIndex={-1}
                         style={{ pointerEvents: 'none' }}
                       />
+                      {!mealTimes[idx] && (
+                        <span className="text-xs text-red-500 mt-1">Wajib diisi</span>
+                      )}
                     </div>
                   ))
                 )}
@@ -464,7 +515,8 @@ export default function Profile() {
           </div>
 
           {/* Card: Kebutuhan Nutrisi */}
-          <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row items-start gap-4 md:gap-6">
+          <div className={`bg-white rounded-2xl shadow-lg p-4 md:p-8 flex flex-col md:flex-row items-start gap-4 md:gap-6
+            ${isNutritionIncomplete ? "border-2 border-yellow-400" : ""}`}>
             <div className="flex-shrink-0">
               <div className="w-16 h-16 rounded-full bg-altGreen flex items-center justify-center">
                 <svg className="w-8 h-8 text-main" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 1.343-3 3 0 1.306.835 2.417 2 2.83V17a1 1 0 102 0v-3.17c1.165-.413 2-1.524 2-2.83 0-1.657-1.343-3-3-3z" /></svg>
@@ -472,7 +524,14 @@ export default function Profile() {
             </div>
             <div className="flex-1 w-full">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-main">Kebutuhan Nutrisi</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-main">Kebutuhan Nutrisi</h2>
+                  {isNutritionIncomplete && (
+                    <span className="ml-2 px-2 py-0.5 rounded bg-yellow-200 text-yellow-800 text-xs font-semibold">
+                      Wajib diisi
+                    </span>
+                  )}
+                </div>
                 {!isEditingNutrition ? (
                   <button
                     onClick={handleEditNutritionToggle}
@@ -512,8 +571,9 @@ export default function Profile() {
                     <input
                       type="number"
                       name="calories"
-                      placeholder="Kalori"
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                      placeholder="cth: 2000"
+                      className={`w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main
+                        ${!editableNutrition.calories ? "border-red-400 bg-yellow-50" : ""}`}
                       value={editableNutrition.calories}
                       onChange={handleNutritionInputChange}
                       disabled={loading}
@@ -521,12 +581,16 @@ export default function Profile() {
                   ) : (
                     <input
                       type="number"
-                      className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                      className={`w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed
+                        ${!nutrition.calories ? "border-red-400 bg-yellow-50" : ""}`}
                       value={nutrition.calories}
                       readOnly
                       tabIndex={-1}
                       style={{ pointerEvents: 'none' }}
                     />
+                  )}
+                  {!nutrition.calories && !isEditingNutrition && (
+                    <span className="text-xs text-red-500 mt-1">Wajib diisi</span>
                   )}
                 </div>
                 <div>
@@ -535,8 +599,9 @@ export default function Profile() {
                     <input
                       type="number"
                       name="protein"
-                      placeholder="Protein (g)"
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                      placeholder="cth: 60"
+                      className={`w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main
+                        ${!editableNutrition.protein ? "border-red-400 bg-yellow-50" : ""}`}
                       value={editableNutrition.protein}
                       onChange={handleNutritionInputChange}
                       disabled={loading}
@@ -544,12 +609,16 @@ export default function Profile() {
                   ) : (
                     <input
                       type="number"
-                      className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                      className={`w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed
+                        ${!nutrition.protein ? "border-red-400 bg-yellow-50" : ""}`}
                       value={nutrition.protein}
                       readOnly
                       tabIndex={-1}
                       style={{ pointerEvents: 'none' }}
                     />
+                  )}
+                  {!nutrition.protein && !isEditingNutrition && (
+                    <span className="text-xs text-red-500 mt-1">Wajib diisi</span>
                   )}
                 </div>
                 <div>
@@ -558,8 +627,9 @@ export default function Profile() {
                     <input
                       type="number"
                       name="fat"
-                      placeholder="Lemak (g)"
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                      placeholder="cth: 50"
+                      className={`w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main
+                        ${!editableNutrition.fat ? "border-red-400 bg-yellow-50" : ""}`}
                       value={editableNutrition.fat}
                       onChange={handleNutritionInputChange}
                       disabled={loading}
@@ -567,12 +637,16 @@ export default function Profile() {
                   ) : (
                     <input
                       type="number"
-                      className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                      className={`w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed
+                        ${!nutrition.fat ? "border-red-400 bg-yellow-50" : ""}`}
                       value={nutrition.fat}
                       readOnly
                       tabIndex={-1}
                       style={{ pointerEvents: 'none' }}
                     />
+                  )}
+                  {!nutrition.fat && !isEditingNutrition && (
+                    <span className="text-xs text-red-500 mt-1">Wajib diisi</span>
                   )}
                 </div>
                 <div>
@@ -581,8 +655,9 @@ export default function Profile() {
                     <input
                       type="number"
                       name="carbs"
-                      placeholder="Karbohidrat (g)"
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main"
+                      placeholder="cth: 250"
+                      className={`w-full p-2 border rounded focus:ring-2 focus:ring-main focus:border-main bg-backdrop text-main
+                        ${!editableNutrition.carbs ? "border-red-400 bg-yellow-50" : ""}`}
                       value={editableNutrition.carbs}
                       onChange={handleNutritionInputChange}
                       disabled={loading}
@@ -590,12 +665,16 @@ export default function Profile() {
                   ) : (
                     <input
                       type="number"
-                      className="w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed"
+                      className={`w-full p-2 border rounded bg-backdrop text-main cursor-not-allowed
+                        ${!nutrition.carbs ? "border-red-400 bg-yellow-50" : ""}`}
                       value={nutrition.carbs}
                       readOnly
                       tabIndex={-1}
                       style={{ pointerEvents: 'none' }}
                     />
+                  )}
+                  {!nutrition.carbs && !isEditingNutrition && (
+                    <span className="text-xs text-red-500 mt-1">Wajib diisi</span>
                   )}
                 </div>
               </div>

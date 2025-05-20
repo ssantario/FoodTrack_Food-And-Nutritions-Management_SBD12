@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "../api/axios";
 import foodLogo from "../assets/apple-svgrepo-com.svg";
@@ -16,6 +16,13 @@ const IconUserCircle = () => <svg className="w-5 h-5 mr-2" fill="none" stroke="c
 // Komponen Navbar Sederhana
 const AppNavbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   const navItems = [
     { path: "/", label: "Home", icon: <IconHome /> },
     { path: "/dashboard", label: "Dashboard", icon: <IconChartBar className="w-5 h-5 mr-2" /> },
@@ -52,6 +59,12 @@ const AppNavbar = () => {
                   {item.label}
                 </Link>
               ))}
+              <button
+                onClick={handleLogout}
+                className="flex items-center px-3 py-2 rounded-md text-sm font-medium bg-red-500 text-white hover:bg-red-600 ml-4 transition-colors duration-150"
+              >
+                Logout
+              </button>
             </div>
           </div>
           {/* Tambahkan tombol menu mobile jika diperlukan */}
@@ -181,7 +194,7 @@ export default function Dashboard() {
           </p>
         </header>
         <div className="mb-8 md:mb-12 flex flex-col md:flex-row justify-center md:justify-start gap-3 md:gap-0">
-          <Link to="/meal-register">
+          <Link to="/food-list">
             <button
               className="bg-gradient-to-r from-[#41897c] to-[#5ab8a5] text-white font-semibold px-5 md:px-7 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-[#5ab8a5] focus:ring-opacity-50"
             >
@@ -263,7 +276,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Overall Score Section */}
+        {/* Overall Score Section
         <div className="mt-10 flex justify-center">
           <div className={`w-full max-w-2xl bg-white p-10 rounded-3xl shadow-2xl border-4 font-bold flex flex-col items-center justify-center ${scoreColor} ring-4 ring-main/20 transition-all duration-300`}>  
             <div className="flex items-center gap-4 mb-4">
@@ -279,7 +292,7 @@ export default function Dashboard() {
               {score === 0 && "Belum ada target nutrisi yang tercapai hari ini."}
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Section Tips Nutrisi (tanpa grafik) */}
         <div className="mt-8 md:mt-12 bg-white p-4 md:p-8 rounded-2xl shadow-xl border border-gray-200/80">
