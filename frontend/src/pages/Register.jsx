@@ -1,11 +1,46 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 export default function Register() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+    setSuccess(false);
+    try {
+      const res = await api.post("/api/auth/register", form);
+      setMessage("Registration successful! Redirecting to login...");
+      setSuccess(true);
+      setForm({ name: "", email: "", password: "" });
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } catch (err) {
+      setSuccess(false);
+      if (err.response && err.response.data && err.response.data.message) {
+        setMessage(err.response.data.message);
+      } else if (err.response && err.response.status === 404) {
+        setMessage("Endpoint tidak ditemukan (404). Hubungi admin/server.");
+      } else {
+        setMessage("Network error.");
+      }
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-100 to-green-200">
-      <form className="bg-white p-8 rounded-lg shadow-2xl w-96">
+      <form
+        className="bg-white p-8 rounded-lg shadow-2xl w-96"
+        onSubmit={handleSubmit}
+      >
         <h2 className="text-3xl font-bold text-center text-green-600 mb-6">
           Register
         </h2>
@@ -76,9 +111,19 @@ export default function Register() {
         <button
           type="submit"
           className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 hover:scale-105 hover:shadow-lg transition-transform duration-300"
+          disabled={loading}
         >
-          Register
+          {loading ? "Registering..." : "Register"}
         </button>
+        {message && (
+          <div
+            className={`mt-4 text-center text-sm ${
+              success ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {message}
+          </div>
+        )}
         <div className="flex items-center my-6">
           <div className="flex-grow h-px bg-gray-300"></div>
           <span className="px-4 text-gray-500">or</span>
