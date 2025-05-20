@@ -1,6 +1,6 @@
-# FoodTrack
+![alt text](readme-img/LogoLong.svg)
 
-Description
+### Descriptions
 
 # 💻 Tech Stack:
 
